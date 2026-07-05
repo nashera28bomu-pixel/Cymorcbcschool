@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Cymor School CBC</title>
+<meta name="theme-color" content="#0F1419">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1419;
+  --ink-raised: #1A212B;
+  --ink-raised-2: #212A36;
+  --ink-line: #2C3644;
+  --paper: #E8EDF2;
+  --text-dim: #8B98A8;
+  --text-dimmer: #5C6B7A;
+  --teal: #0D9488;
+  --teal-bright: #14B8A6;
+  --teal-wash: rgba(13, 148, 136, 0.12);
+  --ee: #1F7A5C;
+  --me: #2563EB;
+  --ae: #D97706;
+  --be: #DC2626;
+  --font-display: "Manrope", sans-serif;
+  --font-body: "Inter", -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+a { color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+h1, h2, h3 { font-family: var(--font-display); }
+
+.hidden { display: none !important; }
+
+/* ---------- Auth screens ---------- */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--ink-raised);
+  border: 1px solid var(--ink-line);
+  border-radius: 16px;
+  padding: 32px 26px;
+}
+.auth-logo { text-align: center; margin-bottom: 22px; }
+.auth-logo .mark { color: var(--teal-bright); font-size: 13px; font-family: var(--font-mono); letter-spacing: 0.15em; }
+.auth-logo h1 { font-size: 22px; margin-top: 6px; }
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12.5px; color: var(--text-dim); margin-bottom: 6px; }
+.field input, .field select {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 9px;
+  border: 1px solid var(--ink-line);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 14px;
+}
+.field input:focus, .field select:focus { outline: none; border-color: var(--teal); }
+
+.btn {
+  padding: 12px 18px;
+  border-radius: 9px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn-primary { background: var(--teal); color: #fff; width: 100%; }
+.btn-primary:hover { background: var(--teal-bright); }
+.btn-ghost { background: transparent; border: 1px solid var(--ink-line); color: var(--paper); }
+.btn-ghost:hover { border-color: var(--teal); }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+.btn-danger { background: var(--be); color: #fff; }
+
+.auth-switch { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-dim); }
+.auth-switch a { color: var(--teal-bright); text-decoration: underline; cursor: pointer; }
+
+.error-msg { background: rgba(220,38,38,0.12); border: 1px solid var(--be); color: #FCA5A5; padding: 10px 13px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; }
+.success-msg { background: rgba(31,122,92,0.12); border: 1px solid var(--ee); color: #6EE7B7; padding: 10px 13px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; }
+
+/* ---------- App shell ---------- */
+.app-shell { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 220px;
+  background: var(--ink-raised);
+  border-right: 1px solid var(--ink-line);
+  padding: 20px 14px;
+  flex-shrink: 0;
+}
+.sidebar-logo { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; color: var(--teal-bright); margin-bottom: 24px; padding: 0 8px; }
+.nav-item {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.nav-item:hover { background: var(--ink-raised-2); color: var(--paper); }
+.nav-item.active { background: var(--teal-wash); color: var(--teal-bright); font-weight: 600; }
+.nav-section-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dimmer); margin: 16px 8px 6px; }
+
+.sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--ink-line); }
+.user-chip { font-size: 12.5px; color: var(--text-dim); padding: 0 8px 10px; }
+.user-chip strong { color: var(--paper); display: block; font-size: 13.5px; }
+
+.main { flex: 1; padding: 28px 32px; overflow-x: auto; }
+.main-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.main-header h2 { font-size: 22px; }
+
+.mobile-topbar { display: none; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--ink-raised); border-bottom: 1px solid var(--ink-line); }
+.mobile-topbar .sidebar-logo { margin: 0; }
+
+@media (max-width: 860px) {
+  .app-shell { flex-direction: column; }
+  .sidebar { display: none; width: 100%; border-right: none; border-bottom: 1px solid var(--ink-line); }
+  .sidebar.open { display: block; }
+  .mobile-topbar { display: flex; }
+  .main { padding: 18px; }
+}
+
+/* ---------- Cards / tables ---------- */
+.card { background: var(--ink-raised); border: 1px solid var(--ink-line); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+.card h3 { font-size: 15px; margin-bottom: 14px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); padding: 8px 10px; border-bottom: 1px solid var(--ink-line); }
+td { padding: 10px; border-bottom: 1px solid var(--ink-line); }
+tr:last-child td { border-bottom: none; }
+.table-wrap { overflow-x: auto; }
+
+.badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 700; font-family: var(--font-mono); }
+.badge-EE { background: rgba(31,122,92,0.18); color: #6EE7B7; }
+.badge-ME { background: rgba(37,99,235,0.18); color: #93C5FD; }
+.badge-AE { background: rgba(217,119,6,0.18); color: #FCD34D; }
+.badge-BE { background: rgba(220,38,38,0.18); color: #FCA5A5; }
+.badge-none { background: var(--ink-line); color: var(--text-dim); }
+
+.mark-input { width: 64px; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--ink-line); background: var(--ink); color: var(--paper); font-family: var(--font-mono); }
+.comment-input { width: 100%; min-width: 160px; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--ink-line); background: var(--ink); color: var(--paper); font-size: 12.5px; }
+
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.form-row .field { flex: 1; min-width: 160px; margin-bottom: 0; }
+
+.empty-state { text-align: center; color: var(--text-dim); padding: 30px; font-size: 13.5px; }
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end; }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+/* ============================================================
+   API layer
+   ============================================================ */
+const API_BASE = ""; // same-origin — frontend is served by the same Express app
+
+const state = {
+  token: localStorage.getItem("cymor_token") || null,
+  user: JSON.parse(localStorage.getItem("cymor_user") || "null"),
+  sidebarOpen: false,
+};
+
+async function api(path, options = {}) {
+  const res = await fetch(API_BASE + path, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(state.token ? { Authorization: "Bearer " + state.token } : {}),
+      ...(options.headers || {}),
+    },
+  });
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const data = isJson ? await res.json() : null;
+  if (!res.ok) {
+    const message = (data && (data.error || data.detail)) || `Request failed (${res.status})`;
+    throw new Error(message);
+  }
+  return data;
+}
+
+function login(token, user) {
+  state.token = token;
+  state.user = user;
+  localStorage.setItem("cymor_token", token);
+  localStorage.setItem("cymor_user", JSON.stringify(user));
+  location.hash = "#/dashboard";
+}
+
+function logout() {
+  state.token = null;
+  state.user = null;
+  localStorage.removeItem("cymor_token");
+  localStorage.removeItem("cymor_user");
+  location.hash = "#/login";
+}
+
+/* ============================================================
+   Router
+   ============================================================ */
+const routes = {
+  "#/login": renderLogin,
+  "#/register-school": renderRegisterSchool,
+  "#/dashboard": renderDashboard,
+  "#/setup": renderSetup,
+  "#/students": renderStudents,
+  "#/staff": renderStaff,
+  "#/assignments": renderAssignments,
+  "#/marks": renderMarks,
+  "#/report": renderReport,
+};
+
+function navigate() {
+  const hash = location.hash || "#/login";
+  const authRoutes = ["#/login", "#/register-school"];
+
+  if (!state.token && !authRoutes.includes(hash)) {
+    location.hash = "#/login";
+    return;
+  }
+  if (state.token && authRoutes.includes(hash)) {
+    location.hash = "#/dashboard";
+    return;
+  }
+
+  const renderFn = routes[hash.split("?")[0]] || renderDashboard;
+  renderFn();
+}
+
+window.addEventListener("hashchange", navigate);
+window.addEventListener("DOMContentLoaded", navigate);
+
+/* ============================================================
+   Shared layout
+   ============================================================ */
+function appShell(activeRoute, contentHtml) {
+  const isAdmin = state.user?.role === "school_admin";
+  const navItems = [
+    { href: "#/dashboard", label: "Dashboard", roles: ["school_admin", "teacher"] },
+    { href: "#/setup", label: "School Setup", roles: ["school_admin"] },
+    { href: "#/students", label: "Students", roles: ["school_admin", "teacher"] },
+    { href: "#/staff", label: "Staff", roles: ["school_admin"] },
+    { href: "#/assignments", label: "Assignments", roles: ["school_admin"] },
+    { href: "#/marks", label: "Marks Entry", roles: ["school_admin", "teacher"] },
+    { href: "#/report", label: "Report Cards", roles: ["school_admin", "teacher"] },
+  ].filter((item) => item.roles.includes(state.user?.role));
+
+  document.getElementById("app").innerHTML = `
+    <div class="mobile-topbar">
+      <div class="sidebar-logo">CYMOR SCHOOL CBC</div>
+      <button class="btn btn-ghost btn-sm" onclick="toggleSidebar()">☰ Menu</button>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar ${state.sidebarOpen ? "open" : ""}" id="sidebar">
+        <div class="sidebar-logo" style="display:none" class="desktop-only">CYMOR SCHOOL CBC</div>
+        ${navItems
+          .map(
+            (item) =>
+              `<a class="nav-item ${activeRoute === item.href ? "active" : ""}" href="${item.href}">${item.label}</a>`
+          )
+          .join("")}
+        <div class="sidebar-footer">
+          <div class="user-chip"><strong>${state.user?.name || ""}</strong>${state.user?.role || ""}</div>
+          <button class="btn btn-ghost btn-sm" style="width:100%" onclick="logout()">Log out</button>
+        </div>
+      </aside>
+      <main class="main">${contentHtml}</main>
+    </div>
+  `;
+}
+
+function toggleSidebar() {
+  state.sidebarOpen = !state.sidebarOpen;
+  document.getElementById("sidebar").classList.toggle("open", state.sidebarOpen);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
+}
+
+function bandBadge(band) {
+  if (!band) return `<span class="badge badge-none">—</span>`;
+  return `<span class="badge badge-${band.code}">${band.code}</span>`;
+}
+
+/* ============================================================
+   Auth views
+   ============================================================ */
+function renderLogin() {
+  document.getElementById("app").innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-logo"><div class="mark">CYMOR SCHOOL CBC</div><h1>Sign in</h1></div>
+        <div id="auth-error"></div>
+        <form id="login-form">
+          <div class="field"><label>Email</label><input type="email" id="login-email" required></div>
+          <div class="field"><label>Password</label><input type="password" id="login-password" required></div>
+          <button class="btn btn-primary" type="submit">Sign in</button>
+        </form>
+        <div class="auth-switch">New school? <a onclick="location.hash='#/register-school'">Register your school</a></div>
+      </div>
+    </div>
+  `;
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value;
+    try {
+      const data = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
+      login(data.token, data.user);
+    } catch (err) {
+      document.getElementById("auth-error").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
+  });
+}
+
+function renderRegisterSchool() {
+  document.getElementById("app").innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-logo"><div class="mark">CYMOR SCHOOL CBC</div><h1>Register your school</h1></div>
+        <div id="auth-error"></div>
+        <form id="register-form">
+          <div class="field"><label>School name</label><input id="reg-school" required></div>
+          <div class="form-row">
+            <div class="field"><label>County</label><input id="reg-county"></div>
+            <div class="field"><label>Sub-county</label><input id="reg-subcounty"></div>
+          </div>
+          <div class="field"><label>Your name (Admin)</label><input id="reg-name" required></div>
+          <div class="field"><label>Email</label><input type="email" id="reg-email" required></div>
+          <div class="field"><label>Phone</label><input id="reg-phone"></div>
+          <div class="field"><label>Password (min 8 characters)</label><input type="password" id="reg-password" minlength="8" required></div>
+          <button class="btn btn-primary" type="submit">Create school account</button>
+        </form>
+        <div class="auth-switch">Already registered? <a onclick="location.hash='#/login'">Sign in</a></div>
+      </div>
+    </div>
+  `;
+  document.getElementById("register-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = {
+      schoolName: document.getElementById("reg-school").value.trim(),
+      county: document.getElementById("reg-county").value.trim(),
+      subCounty: document.getElementById("reg-subcounty").value.trim(),
+      adminName: document.getElementById("reg-name").value.trim(),
+      adminEmail: document.getElementById("reg-email").value.trim(),
+      adminPhone: document.getElementById("reg-phone").value.trim(),
+      adminPassword: document.getElementById("reg-password").value,
+    };
+    try {
+      const data = await api("/api/auth/register-school", { method: "POST", body: JSON.stringify(body) });
+      login(data.token, data.user);
+    } catch (err) {
+      document.getElementById("auth-error").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
+  });
+}
+
+/* ============================================================
+   Dashboard
+   ============================================================ */
+function renderDashboard() {
+  appShell("#/dashboard", `
+    <div class="main-header"><h2>Welcome, ${escapeHtml(state.user?.name || "")}</h2></div>
+    <div class="card">
+      <h3>Getting started</h3>
+      <p style="color:var(--text-dim); font-size:14px; line-height:1.6;">
+        ${
+          state.user?.role === "school_admin"
+            ? "Head to <strong style='color:var(--paper)'>School Setup</strong> to add grade levels, streams, and subjects first. Then add students, create teacher accounts under Staff, and assign teachers to subjects/classes under Assignments. Once that's done, marks can be entered under Marks Entry and report cards downloaded under Report Cards."
+            : "Head to <strong style='color:var(--paper)'>Marks Entry</strong> to grade the classes you've been assigned to. Report cards for your students can be viewed and downloaded under Report Cards."
+        }
+      </p>
+    </div>
+  `);
+}
+
+/* ============================================================
+   Setup: grade levels, streams, subjects, marking scheme
+   ============================================================ */
+async function renderSetup() {
+  appShell("#/setup", `<div class="empty-state">Loading...</div>`);
+
+  const [gradeLevels, streams, subjects, scheme, years] = await Promise.all([
+    api("/api/curriculum/grade-levels"),
+    api("/api/curriculum/streams"),
+    api("/api/curriculum/subjects"),
+    api("/api/marking-scheme").catch(() => null),
+    api("/api/academics/academic-years"),
+  ]);
+
+  const gradeOptions = gradeLevels.map((g) => `<option value="${g._id}">${escapeHtml(g.name)}</option>`).join("");
+  const yearOptions = years.map((y) => `<option value="${y._id}">${escapeHtml(y.name)}</option>`).join("");
+
+  appShell("#/setup", `
+    <div class="main-header"><h2>School Setup</h2></div>
+
+    <div class="card">
+      <h3>Academic Year</h3>
+      <form id="year-form" class="form-row">
+        <div class="field"><label>Year name (e.g. 2026)</label><input id="year-name" required></div>
+        <button class="btn btn-primary btn-sm" type="submit" style="height:42px;">Add Year</button>
+      </form>
+      <div class="table-wrap"><table><tr><th>Year</th><th>Current</th></tr>
+        ${years.map((y) => `<tr><td>${escapeHtml(y.name)}</td><td>${y.isCurrent ? "✓" : ""}</td></tr>`).join("") || `<tr><td colspan="2" class="empty-state">No academic years yet</td></tr>`}
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>Grade Levels</h3>
+      <form id="grade-form" class="form-row">
+        <div class="field"><label>Name (e.g. Grade 4)</label><input id="grade-name" required></div>
+        <div class="field"><label>Education level</label>
+          <select id="grade-level">
+            <option value="pre-primary">Pre-Primary</option>
+            <option value="lower-primary">Lower Primary</option>
+            <option value="upper-primary">Upper Primary</option>
+            <option value="junior-school">Junior School</option>
+            <option value="senior-school">Senior School</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" type="submit" style="height:42px;">Add Grade Level</button>
+      </form>
+      <div class="table-wrap"><table><tr><th>Name</th><th>Education Level</th></tr>
+        ${gradeLevels.map((g) => `<tr><td>${escapeHtml(g.name)}</td><td>${g.educationLevel}</td></tr>`).join("") || `<tr><td colspan="2" class="empty-state">No grade levels yet</td></tr>`}
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>Streams (Classes)</h3>
+      <form id="stream-form" class="form-row">
+        <div class="field"><label>Name (e.g. Blue)</label><input id="stream-name" required></div>
+        <div class="field"><label>Grade level</label><select id="stream-grade">${gradeOptions}</select></div>
+        <div class="field"><label>Academic year</label><select id="stream-year">${yearOptions}</select></div>
+        <button class="btn btn-primary btn-sm" type="submit" style="height:42px;">Add Stream</button>
+      </form>
+      <div class="table-wrap"><table><tr><th>Name</th><th>Grade Level</th></tr>
+        ${streams.map((s) => `<tr><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.gradeLevelId?.name || "")}</td></tr>`).join("") || `<tr><td colspan="2" class="empty-state">No streams yet</td></tr>`}
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>Subjects</h3>
+      <form id="subject-form" class="form-row">
+        <div class="field"><label>Name (e.g. Mathematics)</label><input id="subject-name" required></div>
+        <div class="field"><label>Grade level</label><select id="subject-grade">${gradeOptions}</select></div>
+        <button class="btn btn-primary btn-sm" type="submit" style="height:42px;">Add Subject</button>
+      </form>
+      <div class="table-wrap"><table><tr><th>Name</th><th>Grade Level</th></tr>
+        ${subjects.map((s) => `<tr><td>${escapeHtml(s.name)}</td><td>${gradeLevels.find(g=>g._id===s.gradeLevelId)?.name || ""}</td></tr>`).join("") || `<tr><td colspan="2" class="empty-state">No subjects yet</td></tr>`}
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>Marking Scheme</h3>
+      <p style="color:var(--text-dim); font-size:13px; margin-bottom:14px;">Default bands are seeded from KNEC's official CBC grading table. Edit the ranges below if your school uses different thresholds.</p>
+      <div id="scheme-editor"></div>
+      <button class="btn btn-primary btn-sm" id="save-scheme" style="margin-top:10px;">Save Marking Scheme</button>
+      <div id="scheme-msg"></div>
+    </div>
+  `);
+
+  renderSchemeEditor(scheme);
+
+  document.getElementById("year-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await api("/api/academics/academic-years", { method: "POST", body: JSON.stringify({ name: document.getElementById("year-name").value.trim(), isCurrent: true }) });
+    renderSetup();
+  });
+  document.getElementById("grade-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await api("/api/curriculum/grade-levels", { method: "POST", body: JSON.stringify({ name: document.getElementById("grade-name").value.trim(), educationLevel: document.getElementById("grade-level").value }) });
+    renderSetup();
+  });
+  document.getElementById("stream-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await api("/api/curriculum/streams", { method: "POST", body: JSON.stringify({ name: document.getElementById("stream-name").value.trim(), gradeLevelId: document.getElementById("stream-grade").value, academicYearId: document.getElementById("stream-year").value }) });
+    renderSetup();
+  });
+  document.getElementById("subject-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await api("/api/curriculum/subjects", { method: "POST", body: JSON.stringify({ name: document.getElementById("subject-name").value.trim(), gradeLevelId: document.getElementById("subject-grade").value }) });
+    renderSetup();
+  });
+}
+
+function renderSchemeEditor(scheme) {
+  const bands = scheme?.bands || [
+    { code: "EE", label: "Exceeding Expectation", minPercent: 75, maxPercent: 100, defaultComment: "" },
+    { code: "ME", label: "Meeting Expectation", minPercent: 41, maxPercent: 74, defaultComment: "" },
+    { code: "AE", label: "Approaching Expectation", minPercent: 21, maxPercent: 40, defaultComment: "" },
+    { code: "BE", label: "Below Expectation", minPercent: 0, maxPercent: 20, defaultComment: "" },
+  ];
+
+  document.getElementById("scheme-editor").innerHTML = `
+    <div class="table-wrap"><table>
+      <tr><th>Code</th><th>Label</th><th>Min %</th><th>Max %</th><th>Default Comment</th></tr>
+      ${bands
+        .map(
+          (b, i) => `
+        <tr>
+          <td><span class="badge badge-${b.code}">${b.code}</span></td>
+          <td><input class="mark-input" style="width:140px" data-i="${i}" data-field="label" value="${escapeHtml(b.label)}"></td>
+          <td><input class="mark-input" data-i="${i}" data-field="minPercent" type="number" value="${b.minPercent}"></td>
+          <td><input class="mark-input" data-i="${i}" data-field="maxPercent" type="number" value="${b.maxPercent}"></td>
+          <td><input class="comment-input" data-i="${i}" data-field="defaultComment" value="${escapeHtml(b.defaultComment || "")}"></td>
+        </tr>`
+        )
+        .join("")}
+    </table></div>
+  `;
+
+  document.getElementById("save-scheme").onclick = async () => {
+    const rows = Array.from(document.querySelectorAll("#scheme-editor input"));
+    const updated = bands.map((b) => ({ ...b }));
+    rows.forEach((input) => {
+      const i = Number(input.dataset.i);
+      const field = input.dataset.field;
+      updated[i][field] = field.includes("Percent") ? Number(input.value) : input.value;
+    });
+    try {
+      await api("/api/marking-scheme", { method: "PUT", body: JSON.stringify({ bands: updated }) });
+      document.getElementById("scheme-msg").innerHTML = `<div class="success-msg">Marking scheme saved.</div>`;
+    } catch (err) {
+      document.getElementById("scheme-msg").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
+  };
+}
+
+/* ============================================================
+   Students
+   ============================================================ */
+async function renderStudents() {
+  appShell("#/students", `<div class="empty-state">Loading...</div>`);
+  const [students, gradeLevels, streams] = await Promise.all([
+    api("/api/students"),
+    api("/api/curriculum/grade-levels"),
+    api("/api/curriculum/streams"),
+  ]);
+
+  const isAdmin = state.user?.role === "school_admin";
+  const gradeOptions = gradeLevels.map((g) => `<option value="${g._id}">${escapeHtml(g.name)}</option>`).join("");
+  const streamOptions = streams.map((s) => `<option value="${s._id}">${escapeHtml(s.name)}</option>`).join("");
+
+  appShell("#/students", `
+    <div class="main-header"><h2>Students</h2></div>
+    ${
+      isAdmin
+        ? `<div class="card">
+      <h3>Register a student</h3>
+      <form id="student-form">
+        <div class="form-row">
+          <div class="field"><label>Admission No.</label><input id="s-adm" required></div>
+          <div class="field"><label>First name</label><input id="s-first" required></div>
+          <div class="field"><label>Last name</label><input id="s-last" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Gender</label><select id="s-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
+          <div class="field"><label>Grade level</label><select id="s-grade">${gradeOptions}</select></div>
+          <div class="field"><label>Stream</label><select id="s-stream">${streamOptions}</select></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Guardian name</label><input id="s-guardian"></div>
+          <div class="field"><label>Guardian phone</label><input id="s-guardian-phone"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" type="submit">Register Student</button>
+      </form>
+      <div id="student-msg"></div>
+    </div>`
+        : ""
+    }
+    <div class="card">
+      <h3>All Students (${students.length})</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Adm No.</th><th>Name</th><th>Grade</th><th>Stream</th><th>Status</th></tr>
+        ${
+          students
+            .map(
+              (s) => `<tr><td>${escapeHtml(s.admissionNumber)}</td><td>${escapeHtml(s.firstName)} ${escapeHtml(s.lastName)}</td><td>${escapeHtml(s.gradeLevelId?.name || "")}</td><td>${escapeHtml(s.streamId?.name || "")}</td><td>${s.status}</td></tr>`
+            )
+            .join("") || `<tr><td colspan="5" class="empty-state">No students registered yet</td></tr>`
+        }
+      </table></div>
+    </div>
+  `);
+
+  document.getElementById("student-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = {
+      admissionNumber: document.getElementById("s-adm").value.trim(),
+      firstName: document.getElementById("s-first").value.trim(),
+      lastName: document.getElementById("s-last").value.trim(),
+      gender: document.getElementById("s-gender").value,
+      gradeLevelId: document.getElementById("s-grade").value,
+      streamId: document.getElementById("s-stream").value,
+      guardianName: document.getElementById("s-guardian").value.trim(),
+      guardianPhone: document.getElementById("s-guardian-phone").value.trim(),
+    };
+    try {
+      await api("/api/students", { method: "POST", body: JSON.stringify(body) });
+      renderStudents();
+    } catch (err) {
+      document.getElementById("student-msg").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
+  });
+}
+
+/* ============================================================
+   Staff
+   ============================================================ */
+async function renderStaff() {
+  appShell("#/staff", `<div class="empty-state">Loading...</div>`);
+  const staff = await api("/api/staff");
+
+  appShell("#/staff", `
+    <div class="main-header"><h2>Staff</h2></div>
+    <div class="card">
+      <h3>Add a teacher</h3>
+      <form id="staff-form">
+        <div class="form-row">
+          <div class="field"><label>Name</label><input id="t-name" required></div>
+          <div class="field"><label>Email</label><input type="email" id="t-email" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Phone</label><input id="t-phone"></div>
+          <div class="field"><label>Password (min 8 chars)</label><input type="password" id="t-password" minlength="8" required></div>
+        </div>
+        <button class="btn btn-primary btn-sm" type="submit">Add Teacher</button>
+      </form>
+      <div id="staff-msg"></div>
+    </div>
+    <div class="card">
+      <h3>All Staff (${staff.length})</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th></th></tr>
+        ${
+          staff
+            .map(
+              (t) => `<tr><td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.email)}</td><td>${escapeHtml(t.phone || "")}</td><td>${t.isActive ? "Active" : "Inactive"}</td>
+          <td><button class="btn btn-ghost btn-sm" onclick="toggleStaff('${t._id}', ${!t.isActive})">${t.isActive ? "Deactivate" : "Reactivate"}</button></td></tr>`
+            )
+            .join("") || `<tr><td colspan="5" class="empty-state">No staff added yet</td></tr>`
+        }
+      </table></div>
+    </div>
+  `);
+
+  document.getElementById("staff-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = {
+      name: document.getElementById("t-name").value.trim(),
+      email: document.getElementById("t-email").value.trim(),
+      phone: document.getElementById("t-phone").value.trim(),
+      password: document.getElementById("t-password").value,
+    };
+    try {
+      await api("/api/staff", { method: "POST", body: JSON.stringify(body) });
+      renderStaff();
+    } catch (err) {
+      document.getElementById("staff-msg").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
+  });
+}
+
+async function toggleStaff(id, isActive) {
+  await api(`/api/staff/${id}`, { method: "PATCH", body: JSON.stringify({ isActive }) });
+  renderStaff();
+}
+
+/* ============================================================
+   Teacher Assignments
+   ============================================================ */
+async function renderAssignments() {
+  appShell("#/assignments", `<div class="empty-state">Loading...</div>`);
+  const [assignments, staff, subjects, streams] = await Promise.all([
+    api("/api/teacher-assignments"),
+    api("/api/staff"),
+    api("/api/curriculum/subjects"),
+    api("/api/curriculum/streams"),
+  ]);
+
+  const teacherOptions = staff.map((t) => `<option value="${t._id}">${escapeHtml(t.name)}</option>`).join("");
+  const subjectOptions = subjects.map((s) => `<option value="${s._id}">${escapeHtml(s.name)}</option>`).join("");
+  const streamOptions = streams.map((s) => `<option value="${s._id}">${escapeHtml(s.name)}</option>`).join("");
+
+  appShell("#/assignments", `
+    <div class="main-header"><h2>Teacher Assignments</h2></div>
+    <div class="card">
+      <h3>Assign a teacher to a subject + class</h3>
+      <form id="assignment-form" class="form-row">
+        <div class="field"><label>Teacher</label><select id="a-teacher">${teacherOptions}</select></div>
+        <div class="field"><label>Subject</label><select id="a-subject">${subjectOptions}</select></div>
+        <div class="field"><label>Stream</label><select id="a-stream">${streamOptions}</select></div>
+        <button class="btn btn-primary btn-sm" type="submit" style="height:42px;">Assign</button>
+      </form>
+      <div id="assignment-msg"></div>
+    </div>
+    <div class="card">
+      <h3>Current Assignments</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Teacher</th><th>Subject</th><th>Stream</th><th></th></tr>
+        ${
+          assignments
+            .map(
+              (a) => `<tr><td>${escapeHtml(a.teacherId?.name || "")}</td><td>${escapeHtml(a.subjectId?.name || "")}</td><td>${escapeHtml(a.streamId?.name || "")}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="removeAssignment('${a._id}')">Remove</button></td></tr>`
+            )
+            .join("") || `<tr><td colspan="4" class="empty-state">No assignments yet</td></tr>`
+        }
+      </table></div>
+    </div>
+  `);
+
+  document.getElementById("assignment-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = {
+      teacherId: document.getElementById("a-teacher").value,
+      subjectId: document.getElementById("a-subject").value,
+      streamId: document.getElementById("a-stream").value,
+    };
+    try {
+      await api("/api/teacher-assignments", { method: "POST", body: JSON.stringify(body) });
+      renderAssignments();
+    } catch (err) {
+      document.getElementById("assignment-msg").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
+  });
+}
+
+async function removeAssignment(id) {
+  await api(`/api/teacher-assignments/${id}`, { method: "DELETE" });
+  renderAssignments();
+}
+
+/* ============================================================
+   Marks Entry (gradebook)
+   ============================================================ */
+async function renderMarks() {
+  appShell("#/marks", `<div class="empty-state">Loading...</div>`);
+  const [subjects, streams, terms, assignments] = await Promise.all([
+    api("/api/curriculum/subjects"),
+    api("/api/curriculum/streams"),
+    api("/api/academics/terms"),
+    api("/api/teacher-assignments"),
+  ]);
+
+  // Teachers only see subject/stream combos they're assigned to.
+  const isAdmin = state.user?.role === "school_admin";
+  const allowedPairs = new Set(assignments.map((a) => `${a.subjectId?._id || a.subjectId}|${a.streamId?._id || a.streamId}`));
+
+  const subjectOptions = subjects.map((s) => `<option value="${s._id}">${escapeHtml(s.name)}</option>`).join("");
+  const streamOptions = streams.map((s) => `<option value="${s._id}">${escapeHtml(s.name)}</option>`).join("");
+  const termOptions = terms.map((t) => `<option value="${t._id}">${escapeHtml(t.name)}</option>`).join("");
+
+  appShell("#/marks", `
+    <div class="main-header"><h2>Marks Entry</h2></div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="field"><label>Subject</label><select id="m-subject">${subjectOptions}</select></div>
+        <div class="field"><label>Class</label><select id="m-stream">${streamOptions}</select></div>
+        <div class="field"><label>Term</label><select id="m-term">${termOptions}</select></div>
+        <button class="btn btn-primary btn-sm" id="load-gradebook" style="height:42px;">Load Gradebook</button>
+      </div>
+      <div id="gradebook-msg"></div>
+      <div id="gradebook-wrap"></div>
+    </div>
+  `);
+
+  document.getElementById("load-gradebook").addEventListener("click", async () => {
+    const subjectId = document.getElementById("m-subject").value;
+    const streamId = document.getElementById("m-stream").value;
+    const termId = document.getElementById("m-term").value;
+
+    if (!isAdmin && !allowedPairs.has(`${subjectId}|${streamId}`)) {
+      document.getElementById("gradebook-msg").innerHTML = `<div class="error-msg">You're not assigned to teach this subject for this class.</div>`;
+      document.getElementById("gradebook-wrap").innerHTML = "";
+      return;
+    }
+    document.getElementById("gradebook-msg").innerHTML = "";
+
+    const rows = await api(`/api/assessments/class/${subjectId}/${streamId}/${termId}`);
+    document.getElementById("gradebook-wrap").innerHTML = `
+      <div class="table-wrap"><table>
+        <tr><th>Adm No.</th><th>Name</th><th>Mark</th><th>Rating</th><th>Comment</th></tr>
+        ${
+          rows
+            .map(
+              (r, i) => `<tr>
+            <td>${escapeHtml(r.admissionNumber)}</td>
+            <td>${escapeHtml(r.name)}</td>
+            <td><input class="mark-input" data-student="${r.studentId}" data-i="${i}" type="number" min="0" max="100" value="${r.mark ?? ""}"></td>
+            <td id="band-${i}">${bandBadge(r.band)}</td>
+            <td><input class="comment-input" data-student="${r.studentId}" data-i="${i}" value="${escapeHtml(r.comment || "")}" placeholder="Auto-filled if left blank"></td>
+          </tr>`
+            )
+            .join("") || `<tr><td colspan="5" class="empty-state">No active students in this class</td></tr>`
+        }
+      </table></div>
+      ${rows.length ? `<button class="btn btn-primary btn-sm" id="save-marks" style="margin-top:14px;">Save All Marks</button>` : ""}
+    `;
+
+    document.getElementById("save-marks")?.addEventListener("click", async () => {
+      const markInputs = Array.from(document.querySelectorAll("#gradebook-wrap .mark-input"));
+      const commentInputs = Array.from(document.querySelectorAll("#gradebook-wrap .comment-input"));
+      const entries = markInputs
+        .filter((m) => m.value !== "")
+        .map((m) => ({
+          studentId: m.dataset.student,
+          mark: Number(m.value),
+          comment: commentInputs[Number(m.dataset.i)].value.trim() || undefined,
+        }));
+
+      try {
+        const result = await api("/api/assessments/bulk", {
+          method: "POST",
+          body: JSON.stringify({ subjectId, termId, entries }),
+        });
+        document.getElementById("gradebook-msg").innerHTML = `<div class="success-msg">Saved ${result.saved} mark(s).${result.failed ? ` ${result.failed} failed — check console.` : ""}</div>`;
+        if (result.failed) console.warn(result.errors);
+        document.getElementById("load-gradebook").click();
+      } catch (err) {
+        document.getElementById("gradebook-msg").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+      }
+    });
+  });
+}
+
+/* ============================================================
+   Report Cards
+   ============================================================ */
+async function renderReport() {
+  appShell("#/report", `<div class="empty-state">Loading...</div>`);
+  const [students, terms, streams] = await Promise.all([
+    api("/api/students"),
+    api("/api/academics/terms"),
+    api("/api/curriculum/streams"),
+  ]);
+
+  const studentOptions = students.map((s) => `<option value="${s._id}">${escapeHtml(s.admissionNumber)} — ${escapeHtml(s.firstName)} ${escapeHtml(s.lastName)}</option>`).join("");
+  const termOptions = terms.map((t) => `<option value="${t._id}">${escapeHtml(t.name)}</option>`).join("");
+  const streamOptions = streams.map((s) => `<option value="${s._id}">${escapeHtml(s.name)}</option>`).join("");
+
+  appShell("#/report", `
+    <div class="main-header"><h2>Report Cards</h2></div>
+
+    <div class="card">
+      <h3>Individual Report Card</h3>
+      <div class="toolbar">
+        <div class="field"><label>Student</label><select id="r-student">${studentOptions}</select></div>
+        <div class="field"><label>Term</label><select id="r-term">${termOptions}</select></div>
+        <button class="btn btn-primary btn-sm" id="load-report" style="height:42px;">View Report</button>
+      </div>
+      <div id="report-msg"></div>
+      <div id="report-wrap"></div>
+    </div>
+
+    <div class="card">
+      <h3>Class Ranking Report</h3>
+      <p style="color:var(--text-dim); font-size:13px; margin-bottom:14px;">Every student's marks across all subjects, total, mean mark, mean grade, and class position — available to teachers, not just admins.</p>
+      <div class="toolbar">
+        <div class="field"><label>Class</label><select id="rk-stream">${streamOptions}</select></div>
+        <div class="field"><label>Term</label><select id="rk-term">${termOptions}</select></div>
+        <button class="btn btn-primary btn-sm" id="load-ranking" style="height:42px;">View Ranking</button>
+      </div>
+      <div id="ranking-msg"></div>
+      <div id="ranking-wrap"></div>
+    </div>
+  `);
+
+  document.getElementById("load-report").addEventListener("click", async () => {
+    const studentId = document.getElementById("r-student").value;
+    const termId = document.getElementById("r-term").value;
+    document.getElementById("report-msg").innerHTML = "";
+
+    try {
+      const report = await api(`/api/assessments/report/${studentId}/${termId}`);
+      document.getElementById("report-wrap").innerHTML = `
+        <h3 style="margin:16px 0 4px;">${escapeHtml(report.student.name)} — ${escapeHtml(report.student.admissionNumber)}</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Subject</th><th>Mark</th><th>Rating</th><th>Comment</th></tr>
+          ${report.subjects
+            .map(
+              (s) => `<tr><td>${escapeHtml(s.subjectName)}</td><td>${s.mark ?? "—"}</td><td>${bandBadge(s.band)}</td><td>${escapeHtml(s.comment || "")}</td></tr>`
+            )
+            .join("")}
+        </table></div>
+        <a class="btn btn-primary btn-sm" style="display:inline-block; margin-top:14px; text-decoration:none;"
+           href="/api/reports/student/${studentId}/${termId}/pdf?token=${state.token}"
+           target="_blank">Download PDF Report Card</a>
+      `;
+    } catch (err) {
+      document.getElementById("report-msg").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
+  });
+
+  document.getElementById("load-ranking").addEventListener("click", async () => {
+    const streamId = document.getElementById("rk-stream").value;
+    const termId = document.getElementById("rk-term").value;
+    document.getElementById("ranking-msg").innerHTML = "";
+
+    try {
+      const ranking = await api(`/api/reports/class-ranking/${streamId}/${termId}`);
+      document.getElementById("ranking-wrap").innerHTML = `
+        <div class="table-wrap"><table>
+          <tr>
+            <th>Pos</th><th>Adm No.</th><th>Name</th>
+            ${ranking.subjects.map((s) => `<th>${escapeHtml(s.name)}</th>`).join("")}
+            <th>Total</th><th>Mean</th><th>Grade</th>
+          </tr>
+          ${ranking.rows
+            .map(
+              (r) => `<tr>
+                <td>${r.position ?? "-"}</td>
+                <td>${escapeHtml(r.admissionNumber)}</td>
+                <td>${escapeHtml(r.name)}</td>
+                ${r.marks.map((m) => `<td>${m.mark ?? "-"}</td>`).join("")}
+                <td>${r.total ?? "-"}</td>
+                <td>${r.meanMark ?? "-"}</td>
+                <td>${bandBadge(r.meanGrade)}</td>
+              </tr>`
+            )
+            .join("") || `<tr><td colspan="10" class="empty-state">No active students in this class</td></tr>`}
+        </table></div>
+        ${
+          ranking.rows.length
+            ? `<a class="btn btn-primary btn-sm" style="display:inline-block; margin-top:14px; text-decoration:none;"
+             href="/api/reports/class-ranking/${streamId}/${termId}/pdf?token=${state.token}"
+             target="_blank">Download PDF Class Ranking Report</a>`
+            : ""
+        }
+      `;
+    } catch (err) {
+      document.getElementById("ranking-msg").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
+  });
+}
+</script>
+</body>
+</html>
