@@ -402,12 +402,13 @@ function renderDashboard() {
 async function renderSetup() {
   appShell("#/setup", `<div class="empty-state">Loading...</div>`);
 
-  const [gradeLevels, streams, subjects, scheme, years] = await Promise.all([
+  const [gradeLevels, streams, subjects, scheme, years, terms] = await Promise.all([
     api("/api/curriculum/grade-levels"),
     api("/api/curriculum/streams"),
     api("/api/curriculum/subjects"),
     api("/api/marking-scheme").catch(() => null),
     api("/api/academics/academic-years"),
+    api("/api/academics/terms"),
   ]);
 
   const gradeOptions = gradeLevels.map((g) => `<option value="${g._id}">${escapeHtml(g.name)}</option>`).join("");
@@ -424,6 +425,36 @@ async function renderSetup() {
       </form>
       <div class="table-wrap"><table><tr><th>Year</th><th>Current</th></tr>
         ${years.map((y) => `<tr><td>${escapeHtml(y.name)}</td><td>${y.isCurrent ? "✓" : ""}</td></tr>`).join("") || `<tr><td colspan="2" class="empty-state">No academic years yet</td></tr>`}
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>Terms</h3>
+      ${
+        years.length === 0
+          ? `<p style="color:var(--text-dim); font-size:13px;">Add an academic year above first.</p>`
+          : `<form id="term-form">
+        <div class="form-row">
+          <div class="field"><label>Academic year</label><select id="term-year">${yearOptions}</select></div>
+          <div class="field"><label>Term name (e.g. Term 1)</label><input id="term-name" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Start date</label><input type="date" id="term-start"></div>
+          <div class="field"><label>End date</label><input type="date" id="term-end"></div>
+          <div class="field" style="display:flex; align-items:center; gap:8px; padding-top:22px;">
+            <input type="checkbox" id="term-current" style="width:auto;"><label style="margin:0;">Set as current term</label>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" type="submit">Add Term</button>
+      </form>`
+      }
+      <div id="term-msg"></div>
+      <div class="table-wrap"><table><tr><th>Term</th><th>Academic Year</th><th>Current</th></tr>
+        ${
+          terms
+            .map((t) => `<tr><td>${escapeHtml(t.name)}</td><td>${escapeHtml(years.find((y) => y._id === t.academicYearId)?.name || "")}</td><td>${t.isCurrent ? "✓" : ""}</td></tr>`)
+            .join("") || `<tr><td colspan="3" class="empty-state">No terms yet</td></tr>`
+        }
       </table></div>
     </div>
 
@@ -487,6 +518,22 @@ async function renderSetup() {
     e.preventDefault();
     await api("/api/academics/academic-years", { method: "POST", body: JSON.stringify({ name: document.getElementById("year-name").value.trim(), isCurrent: true }) });
     renderSetup();
+  });
+  document.getElementById("term-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = {
+      academicYearId: document.getElementById("term-year").value,
+      name: document.getElementById("term-name").value.trim(),
+      startDate: document.getElementById("term-start").value || undefined,
+      endDate: document.getElementById("term-end").value || undefined,
+      isCurrent: document.getElementById("term-current").checked,
+    };
+    try {
+      await api("/api/academics/terms", { method: "POST", body: JSON.stringify(body) });
+      renderSetup();
+    } catch (err) {
+      document.getElementById("term-msg").innerHTML = `<div class="error-msg">${escapeHtml(err.message)}</div>`;
+    }
   });
   document.getElementById("grade-form").addEventListener("submit", async (e) => {
     e.preventDefault();
